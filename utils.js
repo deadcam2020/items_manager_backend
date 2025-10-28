@@ -9,6 +9,8 @@ cloudinary.config({
     api_secret: CLOUDINARY_API_SECRET
 })
 
+console.log(CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET);
+
 export async function uploadImage({ filePath, folder }) {
 
     const result = await cloudinary.uploader.upload(filePath, {

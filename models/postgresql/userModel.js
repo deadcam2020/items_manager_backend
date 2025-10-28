@@ -48,15 +48,15 @@ export class UserModel {
         const setQuery = keys.map((key, index) => `${key} = $${index + 1}`).join(', ')
 
         const query = {
-            text: `UPDATE users SET ${setQuery} WHERE id = $${keys.length + 1} RETURNING *;`,
+            text: `UPDATE users SET ${setQuery} WHERE id = $${keys.length + 1} RETURNING id, name, email, document, phone, adress, department, imageurl, imageid;`,
             values: [...values, id],
-        }
-
+        };
         const result = await pool.query(query)
 
-          
+        if (!result) console.log('No hay query')
 
-        return result;
+
+            return result.rows[0];
     }
 
 

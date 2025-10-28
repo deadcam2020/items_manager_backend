@@ -1,12 +1,15 @@
 import { Router } from 'express';
 import { UploadController } from '../controllers/upload.js';
 import { veryfyToken } from '../middlewares/verifyToken.js';
+import { UploadModel } from '../models/upload.js'; // 👈 asegúrate de importarlo
 
-export const createUploadRouter = ({ uploadModel }) => {
+export const createUploadRouter = () => {
   const uploadRouter = Router();
 
-  uploadRouter.post('/postImage', veryfyToken, UploadController.uploadPostImage);
-  uploadRouter.post('/profileImage', veryfyToken, UploadController.uploadProfileImage);
+  const uploadController = new UploadController({ uploadModel: UploadModel });
+
+  uploadRouter.post('/postImage', veryfyToken, uploadController.uploadPostImage);
+  uploadRouter.post('/profileImage', veryfyToken, uploadController.uploadProfileImage);
 
   return uploadRouter;
 };
