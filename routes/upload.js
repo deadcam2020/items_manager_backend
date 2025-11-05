@@ -8,7 +8,7 @@ export const createUploadRouter = () => {
 
   const uploadController = new UploadController({ uploadModel: UploadModel });
 
-  uploadRouter.post('/postImage', veryfyToken, uploadController.uploadPostImage);
+  uploadRouter.post('/productImage', veryfyToken, uploadController.uploadProductImage);
   uploadRouter.post('/profileImage', veryfyToken, uploadController.uploadProfileImage);
 
   return uploadRouter;

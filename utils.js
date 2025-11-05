@@ -9,8 +9,7 @@ cloudinary.config({
     api_secret: CLOUDINARY_API_SECRET
 })
 
-console.log(CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET);
-
+//subir imágenes de Cloudinary. Desde el modelo se envía el path y la carpeta donde queremos guardar la iamgen
 export async function uploadImage({ filePath, folder }) {
 
     const result = await cloudinary.uploader.upload(filePath, {

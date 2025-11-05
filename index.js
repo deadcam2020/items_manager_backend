@@ -12,6 +12,8 @@ import { createUploadRouter } from "./routes/upload.js";
 
 import dotenv from 'dotenv'
 import { UploadModel } from "./models/upload.js";
+import { createProductsRouter } from "./routes/products.js";
+import { ProductsModel } from "./models/postgresql/productsModel.js";
 
 dotenv.config()
 const app = express();
@@ -32,8 +34,10 @@ app.use(
 
 // Usa tu router con el modelo real
 app.use("/api/users", createUserRouter({ userModel: UserModel }));
-app.use("/api/login/", createLoginRouter({loginModel: LoginModel}))
+app.use("/api/login", createLoginRouter({loginModel: LoginModel}))
 app.use("/api/upload", createUploadRouter({uploadModel: UploadModel}))
+app.use("/api/products", createProductsRouter({productsModel: ProductsModel}))
+
 app.use("/api/auth", createAuthRouter());
 
 app.listen(PORT, () => {

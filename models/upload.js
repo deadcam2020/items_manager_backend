@@ -5,7 +5,7 @@ export class UploadModel {
     try {
       const result = await uploadImage({
         filePath,
-        folder: "items_manager_profile",
+        folder: "items_manager_profile", //carpeta que hemos creado en Cloudinary para las imágenes de los usuarios
       });
       return result;
     } catch (error) {
@@ -14,11 +14,11 @@ export class UploadModel {
     }
   }
 
-  static async uploadPostImage(filePath) {
+  static async uploadProductImage(filePath) {
     try {
       const result = await uploadImage({
         filePath,
-        folder: "items_manager_posts",
+        folder: "items_manager", //carpeta que hemos creado en Cloudinary para las imágenes de los productos
       });
       return result;
     } catch (error) {

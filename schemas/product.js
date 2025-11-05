@@ -1,30 +1,37 @@
 import z from 'zod'
 
 const productSchema = z.object({
-  uid: z.number({
-    required_error: 'El id del usuario es obligatorio.'
-  }).int({ message: 'El id del usuario debe ser un número entero' }),
+  // uid: z.number({
+  //   required_error: 'El id del usuario es obligatorio.'
+  // }).int({ message: 'El id del usuario debe ser un número entero' }),
 
-  titulo: z.string()
-    .min(2, { message: 'El título es demasiado corto', required_error: 'El título es obligatorio.' })
+  // id: z.number({
+  //   required_error: 'El id es obligatorio.'
+  // }).int({ message: 'El id del usuario debe ser un número entero' }),
+
+  title: z.string()
+    .min(5, { message: 'El título es demasiado corto', required_error: 'El título es obligatorio.' })
     .max(150, { message: 'El título es demasiado largo' }),
 
-  descripcion: z.string()
+  description: z.string()
     .max(2000, { message: 'La descripción es demasiado larga' })
     .optional(),
 
-  valoracion: z.number()
+  valoration: z.number()
     .min(0, { message: 'La valoración mínima es 0' })
     .max(5, { message: 'La valoración máxima es 5' })
     .optional(),
 
-  categoria: z.string()
+  category: z.string()
     .max(100, { message: 'La categoría es demasiado larga' })
     .optional(),
 
-  precio: z.number({
+  price: z.number({
     required_error: 'El precio es obligatorio.'
-  }).positive({ message: 'El precio debe ser mayor que 0' })
+  }).positive({ message: 'El precio debe ser mayor que 0' }),
+
+  imageurl: z.string().optional(), // 👈 agrega esto
+  imageid: z.string().optional()
 })
 
 export function validateProduct(input) {

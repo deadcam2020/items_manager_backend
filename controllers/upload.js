@@ -7,30 +7,44 @@ export class UploadController {
   }
 
   // 🔹 Subir imagen para posts
-  uploadPostImage = async (req, res) => {
-    try {
-      if (!req.files?.file) {
+  uploadProductImage = async (req, res) => {
+     try {
+      if (!req.files?.productImage) {
         return res.status(400).json({ error: "No image uploaded" });
       }
 
-      const filePath = req.files.file.tempFilePath;
-      const file = await this.uploadModel.uploadPostImage(filePath);
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+
+      const filePath = req.files.productImage.tempFilePath;
+
+      // Subir a Cloudinary
+      const uploadResult = await this.uploadModel.uploadProductImage(filePath); //todo: productModel para subir imágenes a Cloudinary
 
       // Intentar eliminar el archivo temporal (sin romper si no existe)
       try {
         await unlink(filePath);
       } catch (unlinkErr) {
-        console.warn("⚠️ Archivo temporal no encontrado:", unlinkErr.message);
+        console.warn(" Archivo temporal no encontrado:", unlinkErr.message);
       }
 
-      if (!file) {
-        return res.status(400).json({ error: "Error uploading file" });
+      if (!uploadResult) {
+        return res
+          .status(500)
+          .json({ error: "Error uploading to Cloudinary" });
       }
 
-      return res.status(201).json(file);
+      const imageurl = uploadResult.secure_url;
+      const imageid = uploadResult.public_id;
+
+     
+
+      return res.status(201).json({ imageurl, imageid });
     } catch (error) {
-      console.error("Error in uploadPostImage:", error);
-      res.status(500).json({ error: "Error uploading post image" });
+      console.error("Error in uploadProductImage:", error);
+      res.status(500).json({ error: "Error uploading product image" });
     }
   };
 
