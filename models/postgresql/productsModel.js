@@ -32,27 +32,27 @@ export class ProductsModel {
     }
 
 
-    static async updateProduct({ id, input }) {
-        const keys = Object.keys(input)
-        const values = Object.values(input)
+    // static async updateProduct({ id, input }) {
+    //     const keys = Object.keys(input)
+    //     const values = Object.values(input)
 
-        if (keys.length === 0) {
-            throw new Error('No hay campos para actualizar')
-        }
+    //     if (keys.length === 0) {
+    //         throw new Error('No hay campos para actualizar')
+    //     }
 
-        const setQuery = keys.map((key, index) => `${key} = $${index + 1}`).join(', ')
+    //     const setQuery = keys.map((key, index) => `${key} = $${index + 1}`).join(', ')
 
-        const query = {
-            text: `UPDATE users SET ${setQuery} WHERE id = $${keys.length + 1} RETURNING id, name, email, document, phone, adress, department, imageurl, imageid;`,
-            values: [...values, id],
-        };
-        const result = await pool.query(query)
+    //     const query = {
+    //         text: `UPDATE users SET ${setQuery} WHERE id = $${keys.length + 1} RETURNING id, name, email, document, phone, adress, department, imageurl, imageid;`,
+    //         values: [...values, id],
+    //     };
+    //     const result = await pool.query(query)
 
-        if (!result) console.log('No hay query')
+    //     if (!result) console.log('No hay query')
 
 
-        return result.rows[0];
-    }
+    //     return result.rows[0];
+    // }
 
 
 
@@ -106,5 +106,49 @@ export class ProductsModel {
             console.log('findProductById error: ', error);
 
         }
+    }
+
+    static async deleteProductById(id) {
+
+        try {
+            const query = {
+                text: `DELETE
+                FROM products
+                WHERE id = $1`,
+                values: [id],
+            };
+
+            await pool.query(query)
+
+            return true
+
+        } catch (error) {
+            console.log('daleteProductById error: ', error);
+            throw error
+        }
+    }
+
+    static async updateProductById( {id, input} ) {
+        const keys = Object.keys(input)
+        const values = Object.values(input)
+
+        if (keys.length === 0) {
+            throw new Error('No hay campos para actualizar')
+        }
+
+        const setQuery = keys.map((key, index) => `${key} = $${index + 1}`).join(', ')
+
+        const query = {
+            text: `UPDATE products SET ${setQuery} WHERE id = $${keys.length + 1} RETURNING id, uid, title, description, price, category, imageid, imageurl, valoration, created_at;`,
+            values: [...values, id],
+        };
+
+        const result = await pool.query(query)
+
+        if (!result || result.rows.length === 0) {
+            throw new Error('No se pudo actualizar el producto');
+        }
+
+        return result.rows[0];
     }
 }
