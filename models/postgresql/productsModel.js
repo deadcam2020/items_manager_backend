@@ -1,17 +1,20 @@
 import { v4 as uuidv4 } from 'uuid'
 import pool from "../../db.js";
+import { deleteImage } from '../../utils.js';
 
 export class ProductsModel {
 
     static async create({ uid, input }) {
-        const { title, description, price, category, imageurl, imageid } = input;
+        const { title, description, price, category, imageurl, imageid, seller, stock } = input;
 
         const id = uuidv4();
+        console.log(seller, stock);
+        
 
         try {
             const query = await pool.query(
-                'INSERT INTO products (id, uid, title, description, price, category, imageurl, imageid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);',
-                [id, uid, title, description, price, category, imageurl, imageid]
+                'INSERT INTO products (id, uid, title, description, price, category, imageurl, imageid, seller, stock) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);',
+                [id, uid, title, description, price, category, imageurl, imageid, seller, stock]
             );
 
         } catch (error) {
@@ -100,6 +103,27 @@ export class ProductsModel {
 
             if (!result) console.log('No hay query')
 
+            return result.rows[0];
+
+        } catch (error) {
+            console.log('findProductById error: ', error);
+
+        }
+    }
+
+    static async getAllProducts() {
+
+        try {
+            const query = {
+                text: `SELECT *
+                FROM products
+                `
+            };
+
+            const result = await pool.query(query)
+
+            if (!result) console.log('No hay query')
+
             return result.rows;
 
         } catch (error) {
@@ -119,6 +143,8 @@ export class ProductsModel {
             };
 
             await pool.query(query)
+
+            //await deleteImage(publicid)
 
             return true
 

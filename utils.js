@@ -25,5 +25,17 @@ export async function uploadImage({ filePath, folder }) {
 
 }
 
+export async function deleteImage(publicId) {
+    try {
+    
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log("Imagen eliminada de Cloudinary:", result);
+        return result;
+    } catch (error) {
+        console.error("Error eliminando imagen de Cloudinary:", error);
+        throw error;
+    }
+}
+
 
 export const createToken = (payload) => jwt.sign(payload, JWT_SECRET)

@@ -26,4 +26,13 @@ export class UploadModel {
       return null;
     }
   }
+
+  // static async delete(fileId) {
+  //   try {
+  //     await deleteImage(fileId)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
+
 }

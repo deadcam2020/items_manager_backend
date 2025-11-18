@@ -1,4 +1,5 @@
 import { validateProduct, validatePartialProduct } from "../schemas/product.js";
+import { deleteImage } from "../utils.js";
 
 
 export class ProductsController {
@@ -15,6 +16,9 @@ export class ProductsController {
         if (!result.success) {
             return res.status(400).json({ error: JSON.parse(result.error.message) })
         }
+
+        console.log(result.data);
+        
 
         try {
             const newProduct = await this.productsModel.create({ uid, input: result.data })
@@ -60,7 +64,7 @@ export class ProductsController {
             }
 
             //  Devuelve solo el primer producto, no un array
-            return res.status(200).json(product[0]);
+            return res.status(200).json(product);
 
         } catch (error) {
             console.error("Error en getProductById:", error);
@@ -68,47 +72,96 @@ export class ProductsController {
         }
     };
 
+
+    getProducts = async (req, res) => {
+
+        try {
+            const products = await this.productsModel.getAllProducts();
+
+            if (!products || products.length === 0) {
+                return res.status(404).json({ message: "No se encontraron productos" });
+            }
+
+            //  Devuelve solo el primer producto, no un array
+            return res.status(200).json(products);
+
+        } catch (error) {
+            console.error("Error en getProductById:", error);
+            return res.status(500).json({ error: "Error obteniendo los productos" });
+        }
+    };
+
+
     deleteProduct = async (req, res) => {
         const { id } = req.params;
 
         try {
-            const result = await this.productsModel.deleteProductById(id);
+            // 1️⃣ Buscar el producto antes de borrarlo para obtener el imageid
+            const product = await this.productsModel.findProductById(id);
 
-            if (!result) {
-                return res.status(404).json({ message: "No se pudo eliminar este producto" });
+            if (!product) {
+                return res.status(404).json({ message: "Producto no encontrado" });
+            }
+
+            // 2️⃣ Eliminar el producto de la BD
+            const deleted = await this.productsModel.deleteProductById(id);
+
+            console.log(product.id);
+            console.log(product.imageid);
+
+            
+            // 3️⃣ Eliminar la imagen de Cloudinary si existe
+            if (product.imageid) {
+              const delatedImage =  await deleteImage(product.imageid);
+              console.log(deleteImage);
+              
+            }
+
+            if (!deleted) {
+                return res.status(404).json({ message: "No se pudo eliminar el producto" });
             }
 
             return res.status(200).json({ message: "Producto eliminado correctamente" });
-
         } catch (error) {
             console.error("Error en deleteProduct:", error);
             return res.status(500).json({ error: "Error eliminando el producto" });
         }
     };
 
+
     updateProduct = async (req, res) => {
-        const result = validatePartialProduct(req.body);
-        const id = req.params.id; // ahora sí, viene de la URL
-        console.log(req.body);
-        console.log(id);
+  const result = validatePartialProduct(req.body);
+  const id = req.params.id;
 
+  const { oldImageId } = req.body;  
 
+  if (!result.success) {
+    return res.status(400).json({ error: result.error });
+  }
 
-        if (!result.success) {
-            return res.status(400).json({ error: result.error });
+  try {
+
+      //  Actualizar producto
+      const updatedProduct = await this.productsModel.updateProductById({
+          id,
+          input: result.data,
+        });
+        
+        //  Si viene oldImageId, eliminar imagen previa en Cloudinary
+        if (oldImageId) {
+          try {
+            await deleteImage(oldImageId);
+          } catch (err) {
+            console.warn("No se pudo eliminar la imagen anterior:", err.message);
+          }
         }
+    res.status(200).json(updatedProduct);
 
-        try {
-            const updatedProduct = await this.productsModel.updateProductById({
-                id,
-                input: result.data,
-            });
-            res.status(200).json(updatedProduct);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Error updating product' });
-        }
-    };
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error updating product' });
+  }
+};
 
 
 
