@@ -1,4 +1,5 @@
 import { validatePartialUser, validateUser } from '../schemas/user.js'
+import { deleteImage } from '../utils.js'
 
 export class UserController {
   constructor({ userModel }) {
@@ -26,6 +27,8 @@ export class UserController {
     const result = validatePartialUser(req.body)
     const userId = req.user.id;
 
+    
+
     if (!result.success) {
       return res.status(400).json({ error: JSON.parse(result.error.message) })
     }
@@ -33,6 +36,8 @@ export class UserController {
     try {
       const updatedUser = await this.userModel.updateUser({ id: userId, input: result.data })
       res.status(200).json(updatedUser)
+
+     
 
     } catch (error) {
       console.error(error)

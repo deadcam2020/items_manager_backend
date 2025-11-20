@@ -1,4 +1,5 @@
 import { validateProduct, validatePartialProduct } from "../schemas/product.js";
+import { validatePartialSale, validateSale } from "../schemas/sales.js";
 import { deleteImage } from "../utils.js";
 
 
@@ -18,7 +19,7 @@ export class ProductsController {
         }
 
         console.log(result.data);
-        
+
 
         try {
             const newProduct = await this.productsModel.create({ uid, input: result.data })
@@ -109,12 +110,12 @@ export class ProductsController {
             console.log(product.id);
             console.log(product.imageid);
 
-            
+
             // 3️⃣ Eliminar la imagen de Cloudinary si existe
             if (product.imageid) {
-              const delatedImage =  await deleteImage(product.imageid);
-              console.log(deleteImage);
-              
+                const delatedImage = await deleteImage(product.imageid);
+                console.log(deleteImage);
+
             }
 
             if (!deleted) {
@@ -130,41 +131,65 @@ export class ProductsController {
 
 
     updateProduct = async (req, res) => {
-  const result = validatePartialProduct(req.body);
-  const id = req.params.id;
+        const result = validatePartialProduct(req.body);
+        const id = req.params.id;
 
-  const { oldImageId } = req.body;  
+        const { oldImageId } = req.body;
 
-  if (!result.success) {
-    return res.status(400).json({ error: result.error });
-  }
-
-  try {
-
-      //  Actualizar producto
-      const updatedProduct = await this.productsModel.updateProductById({
-          id,
-          input: result.data,
-        });
-        
-        //  Si viene oldImageId, eliminar imagen previa en Cloudinary
-        if (oldImageId) {
-          try {
-            await deleteImage(oldImageId);
-          } catch (err) {
-            console.warn("No se pudo eliminar la imagen anterior:", err.message);
-          }
+        if (!result.success) {
+            return res.status(400).json({ error: result.error });
         }
-    res.status(200).json(updatedProduct);
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error updating product' });
-  }
-};
+        try {
+
+            //  Actualizar producto
+            const updatedProduct = await this.productsModel.updateProductById({
+                id,
+                input: result.data,
+            });
+
+            //  Si viene oldImageId, eliminar imagen previa en Cloudinary
+            if (oldImageId) {
+                try {
+                    await deleteImage(oldImageId);
+                } catch (err) {
+                    console.warn("No se pudo eliminar la imagen anterior:", err.message);
+                }
+            }
+            res.status(200).json(updatedProduct);
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error updating product' });
+        }
+    };
 
 
+    createSale = async (req, res) => {
+        const result = validatePartialSale(req.body)
+        const buyer_id = result.data.buyer_id;
 
+        console.log('buyer_id: ', buyer_id);
+
+        console.log('result.data: ', result.data);
+
+        if (!result.success) {
+            return res.status(400).json({ error: JSON.parse(result.error.message) })
+        }
+
+        console.log(result.data);
+
+
+        try {
+            const sale = await this.productsModel.saveSale({ buyer_id, input: result.data })
+            res.status(201).json(sale)
+            return
+        } catch (error) {
+            console.error(error)
+            return res.status(500).json({ error: 'Error creating product' })
+
+        }
+    }
 
 
 }

@@ -9,7 +9,7 @@ export class ProductsModel {
 
         const id = uuidv4();
         console.log(seller, stock);
-        
+
 
         try {
             const query = await pool.query(
@@ -154,7 +154,7 @@ export class ProductsModel {
         }
     }
 
-    static async updateProductById( {id, input} ) {
+    static async updateProductById({ id, input }) {
         const keys = Object.keys(input)
         const values = Object.values(input)
 
@@ -177,4 +177,34 @@ export class ProductsModel {
 
         return result.rows[0];
     }
+
+
+    static async saveSale({ buyer_id, input }) {
+        const { seller_id, product_id, unit_price, quantity, payment_method } = input;
+
+        const id = uuidv4();
+
+        try {
+            const query = await pool.query(
+                'INSERT INTO sales (id, buyer_id, seller_id, product_id, unit_price, quantity, payment_method) VALUES ($1, $2, $3, $4, $5, $6, $7);',
+                [id, buyer_id, seller_id, product_id, unit_price, quantity, payment_method]
+            );
+
+        } catch (error) {
+            console.error("Error en saveSale:", error);
+            throw new Error("Error creating new product");
+        }
+
+
+        const result = await pool.query(
+            `SELECT *
+            FROM sales WHERE id = $1;`,
+            [id]
+        )
+
+
+
+        return result.rows
+    }
+
 }

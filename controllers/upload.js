@@ -1,5 +1,6 @@
 import { unlink } from "node:fs/promises";
 import { UserModel } from "../models/postgresql/userModel.js";
+import { deleteImage } from "../utils.js";
 
 export class UploadController {
   constructor({ uploadModel }) {
@@ -50,6 +51,8 @@ export class UploadController {
 
   // 🔹 Subir imagen de perfil
   uploadProfileImage = async (req, res) => {
+
+    const {oldProfileImageId} = req.body
     try {
       if (!req.files?.profileImage) {
         return res.status(400).json({ error: "No image uploaded" });
@@ -80,6 +83,16 @@ export class UploadController {
 
       const imageurl = uploadResult.secure_url;
       const imageid = uploadResult.public_id;
+
+
+      //eliminar la imagen anterior de Cloudinary
+       if (oldProfileImageId) {
+        try {
+          await deleteImage(oldProfileImageId);
+        } catch (err) {
+          console.warn("No se pudo eliminar la imagen anterior:", err.message);
+        }
+      }
 
       // Actualizar al usuario en la BD
       await UserModel.updateUser({

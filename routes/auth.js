@@ -22,7 +22,7 @@ export const createAuthRouter = () => {
 
       // Consulta a la BD para confirmar que el usuario sigue existiendo
       const result = await pool.query(
-        "SELECT id, name, email, role, phone, adress, department, document, imageurl, imageid FROM users WHERE id = $1",
+        "SELECT * FROM users WHERE id = $1",
         [decoded.id]
       );
 
