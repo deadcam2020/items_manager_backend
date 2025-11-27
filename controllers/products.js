@@ -75,9 +75,10 @@ export class ProductsController {
 
 
     getProducts = async (req, res) => {
+        const {id } = req.query
 
         try {
-            const products = await this.productsModel.getAllProducts();
+            const products = await this.productsModel.getAllProducts(id);
 
             if (!products || products.length === 0) {
                 return res.status(404).json({ message: "No se encontraron productos" });
@@ -131,11 +132,12 @@ export class ProductsController {
 
 
     updateProduct = async (req, res) => {
-        const result = validatePartialProduct(req.body);
         const id = req.params.id;
+        const {oldImageId, ...productData} = req.body;
 
-        const { oldImageId } = req.body;
-
+        const result = validatePartialProduct(productData);
+ 
+  
         if (!result.success) {
             return res.status(400).json({ error: result.error });
         }
@@ -171,13 +173,12 @@ export class ProductsController {
 
         console.log('buyer_id: ', buyer_id);
 
-        console.log('result.data: ', result.data);
 
         if (!result.success) {
             return res.status(400).json({ error: JSON.parse(result.error.message) })
         }
 
-        console.log(result.data);
+        console.log("Data: ",result.data);
 
 
         try {

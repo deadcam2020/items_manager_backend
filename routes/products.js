@@ -7,7 +7,7 @@ export const createProductsRouter = ({ productsModel }) => {
   const productsController = new ProductsController({ productsModel })
 
   productsRouter.post('/', veryfyToken, productsController.createProduct)
-  productsRouter.get('/products', productsController.getProducts) 
+  productsRouter.get('/products', veryfyToken, productsController.getProducts) 
 
   productsRouter.get('/userProducts/:uid', veryfyToken, productsController.getUserProducts)
   productsRouter.get('/product/:id', veryfyToken, productsController.getProductById)

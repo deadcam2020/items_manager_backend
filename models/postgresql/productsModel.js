@@ -64,7 +64,7 @@ export class ProductsModel {
         try {
 
             const query = {
-                text: `SELECT id, uid, title, description, price, category, imageurl, imageid, created_at
+                text: `SELECT *
                 FROM products
                 WHERE uid = $1
                 ORDER BY created_at DESC;`,
@@ -111,13 +111,14 @@ export class ProductsModel {
         }
     }
 
-    static async getAllProducts() {
+    static async getAllProducts(id) {
 
         try {
             const query = {
                 text: `SELECT *
-                FROM products
-                `
+                FROM products WHERE uid != $1
+                `,
+                values: [id]
             };
 
             const result = await pool.query(query)
@@ -165,7 +166,7 @@ export class ProductsModel {
         const setQuery = keys.map((key, index) => `${key} = $${index + 1}`).join(', ')
 
         const query = {
-            text: `UPDATE products SET ${setQuery} WHERE id = $${keys.length + 1} RETURNING id, uid, title, description, price, category, imageid, imageurl, valoration, created_at;`,
+            text: `UPDATE products SET ${setQuery} WHERE id = $${keys.length + 1} RETURNING id, uid, title, description, price, category, imageid, imageurl, valoration, created_at, stock;`,
             values: [...values, id],
         };
 
@@ -180,14 +181,14 @@ export class ProductsModel {
 
 
     static async saveSale({ buyer_id, input }) {
-        const { seller_id, product_id, unit_price, quantity, payment_method } = input;
+        const { seller_id, seller_name, buyer_name, product_id, unit_price, quantity, payment_method, imageurl, title } = input;
 
         const id = uuidv4();
 
         try {
             const query = await pool.query(
-                'INSERT INTO sales (id, buyer_id, seller_id, product_id, unit_price, quantity, payment_method) VALUES ($1, $2, $3, $4, $5, $6, $7);',
-                [id, buyer_id, seller_id, product_id, unit_price, quantity, payment_method]
+                'INSERT INTO sales (id, buyer_id, seller_id, seller_name, buyer_name, product_id, unit_price, quantity, payment_method, imageurl, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);',
+                [id, buyer_id, seller_id, seller_name, buyer_name, product_id, unit_price, quantity, payment_method, imageurl, title,]
             );
 
         } catch (error) {
@@ -206,5 +207,40 @@ export class ProductsModel {
 
         return result.rows
     }
+
+
+    static async generateInvoiceNumber() {
+
+        
+    try {
+        const query = `
+            SELECT invoice_number 
+            FROM sales 
+            WHERE invoice_number IS NOT NULL
+            ORDER BY created_at DESC 
+            LIMIT 1;
+        `;
+
+        const result = await pool.query(query);
+
+        let nextNumber = 1; 
+
+        if (result.rows.length > 0) {
+            const lastInvoice = result.rows[0].invoice_number; // FAC-000123
+
+            const numericPart = parseInt(lastInvoice.replace("FAC-", ""), 10);
+
+            nextNumber = numericPart + 1;
+        }
+
+        const formatted = String(nextNumber).padStart(6, "0"); // → 000124
+        return `FAC-${formatted}`;
+
+    } catch (error) {
+        console.error("Error generando número de factura", error);
+        throw error;
+    }
+}
+
 
 }

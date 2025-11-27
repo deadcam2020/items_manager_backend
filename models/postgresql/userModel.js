@@ -60,27 +60,26 @@ export class UserModel {
     }
 
 
-    // static async updateUser({ id, input }) {
-    //     const { name, email, document, phone, adress, department } = input;
+      static async findProductsPurchasedByUser(id) {
+        
+        try {
+            const query = {
+                text: `SELECT *
+                FROM sales
+                WHERE buyer_id = $1`,
+                values: [id],
+            };
 
-    //     try {
+            const result = await pool.query(query)
 
-    //         const updateUserQuery = {
-    //             text: 'UPDATE users SET name = $1, email = $2, document = $3, phone = $4, adress = $5, department = $6 WHERE id = $7;',
-    //             values: [name, email, document, phone, adress, department, id]
-    //         }
-    //         const updatedUser = await pool.query(updateUserQuery)
+            if (!result) console.log('No hay query')
 
-    //         return updatedUser.rows
+            return result.rows;
 
-    //     } catch (error) {
-    //         console.log('userModel: ', error);
+        } catch (error) {
+            console.log('findProductById error: ', error);
 
-    //     }
-
-
-
-    // }
-
+        }
+    }
 
 }

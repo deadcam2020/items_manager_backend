@@ -8,6 +8,8 @@ export const createUserRouter = ({ userModel }) => {
 
   userRouter.post('/', userController.createNewUser)
   userRouter.put('/update', veryfyToken, userController.updateUser)
+  userRouter.get('/myPurchases/:buyer_id', veryfyToken, userController.getProductsPurchasedByUser)
+
 
   return userRouter
 }

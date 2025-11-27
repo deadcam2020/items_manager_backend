@@ -1,11 +1,16 @@
 import z from "zod";
 
 export const saleSchema = z.object({
+
+  title: z.string()
+    .min(5, { message: 'El título es demasiado corto', required_error: 'El título es obligatorio.' })
+    .max(200, { message: 'El título es demasiado largo' }),
+    
   buyer_id: z.string({
     required_error: "El ID del comprador es obligatorio",
   }).uuid("buyer_id debe ser un UUID válido"),
 
-   seller_id: z.string({
+  seller_id: z.string({
     required_error: "El ID del vendedor es obligatorio",
   }).uuid("buyer_id debe ser un UUID válido"),
 
@@ -30,7 +35,18 @@ export const saleSchema = z.object({
     .max(50, "El estado es demasiado largo")
     .optional(),  // default: 'completed'
 
-  notes: z.string().optional()
+  seller_name: z.string()
+    .min(2, { message: 'El nombre es demasiado corto', required_error: 'El vendedor es obligatorio.' })
+    .max(150, { message: 'El nombre es demasiado largo' }),
+
+
+  buyer_name: z.string()
+    .min(2, { message: 'El nombre es demasiado corto', required_error: 'El comprador es obligatorio.' })
+    .max(150, { message: 'El nombre es demasiado largo' }),
+
+  notes: z.string().optional(),
+
+  imageurl: z.string().optional(),
 });
 
 export function validateSale(input) {
