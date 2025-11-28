@@ -75,7 +75,7 @@ export class ProductsController {
 
 
     getProducts = async (req, res) => {
-        const {id } = req.query
+        const { id } = req.query
 
         try {
             const products = await this.productsModel.getAllProducts(id);
@@ -133,11 +133,11 @@ export class ProductsController {
 
     updateProduct = async (req, res) => {
         const id = req.params.id;
-        const {oldImageId, ...productData} = req.body;
+        const { oldImageId, ...productData } = req.body;
 
         const result = validatePartialProduct(productData);
- 
-  
+
+
         if (!result.success) {
             return res.status(400).json({ error: result.error });
         }
@@ -178,7 +178,7 @@ export class ProductsController {
             return res.status(400).json({ error: JSON.parse(result.error.message) })
         }
 
-        console.log("Data: ",result.data);
+        console.log("Data: ", result.data);
 
 
         try {
@@ -191,6 +191,23 @@ export class ProductsController {
 
         }
     }
+
+
+    searchProducts = async (req, res) => {
+        const { query, min = 0, max = 999999999 } = req.query;
+console.log('PARAMS: ',req.query);
+
+        try {
+            const search = await this.productsModel.searchProducts(query, min, max);
+
+            return res.status(200).json(search);
+
+        } catch (error) {
+            console.log("Error en searchController:", error);
+            return res.status(500).json({ error: "Error en búsqueda" });
+        }
+    };
+
 
 
 }

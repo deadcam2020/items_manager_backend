@@ -211,9 +211,9 @@ export class ProductsModel {
 
     static async generateInvoiceNumber() {
 
-        
-    try {
-        const query = `
+
+        try {
+            const query = `
             SELECT invoice_number 
             FROM sales 
             WHERE invoice_number IS NOT NULL
@@ -221,26 +221,53 @@ export class ProductsModel {
             LIMIT 1;
         `;
 
-        const result = await pool.query(query);
+            const result = await pool.query(query);
 
-        let nextNumber = 1; 
+            let nextNumber = 1;
 
-        if (result.rows.length > 0) {
-            const lastInvoice = result.rows[0].invoice_number; // FAC-000123
+            if (result.rows.length > 0) {
+                const lastInvoice = result.rows[0].invoice_number; // FAC-000123
 
-            const numericPart = parseInt(lastInvoice.replace("FAC-", ""), 10);
+                const numericPart = parseInt(lastInvoice.replace("FAC-", ""), 10);
 
-            nextNumber = numericPart + 1;
+                nextNumber = numericPart + 1;
+            }
+
+            const formatted = String(nextNumber).padStart(6, "0"); // → 000124
+            return `FAC-${formatted}`;
+
+        } catch (error) {
+            console.error("Error generando número de factura", error);
+            throw error;
         }
-
-        const formatted = String(nextNumber).padStart(6, "0"); // → 000124
-        return `FAC-${formatted}`;
-
-    } catch (error) {
-        console.error("Error generando número de factura", error);
-        throw error;
     }
-}
+
+    static searchProducts = async (text, min, max) => {
+        try {
+            const query = {
+                text: `
+        SELECT *
+        FROM products
+        WHERE
+          (
+            unaccent(title) ILIKE unaccent($1)
+            OR unaccent(description) ILIKE unaccent($1)
+          )
+        AND price >= $2
+        AND price <= $3;
+      `,
+                values: [`%${text}%`, min, max],
+            };
+
+            const response = await pool.query(query);
+            return response.rows;
+
+        } catch (error) {
+            console.error("Model Error:", error);
+            throw error;
+        }
+    };
+
 
 
 }

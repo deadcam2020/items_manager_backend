@@ -14,6 +14,8 @@ export const createProductsRouter = ({ productsModel }) => {
   productsRouter.delete('/deleteProduct/:id', veryfyToken, productsController.deleteProduct)
   productsRouter.put('/update/:id', veryfyToken, productsController.updateProduct);
   productsRouter.post('/sale', veryfyToken, productsController.createSale) 
+  productsRouter.get('/search', veryfyToken, productsController.searchProducts) 
+
 
   return productsRouter
 }
