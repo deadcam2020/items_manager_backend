@@ -19,6 +19,9 @@ const productSchema = z.object({
     .max(100, { message: 'La categoría es demasiado larga' })
     .optional(),
 
+    status: z.string()
+    .max(100, { message: 'El estado es demasiado larga' }),
+
   price: z.number({
     required_error: 'El precio es obligatorio.'
   }).positive({ message: 'El precio debe ser mayor que 0' }),

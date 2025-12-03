@@ -5,16 +5,15 @@ import { deleteImage } from '../../utils.js';
 export class ProductsModel {
 
     static async create({ uid, input }) {
-        const { title, description, price, category, imageurl, imageid, seller, stock } = input;
+        const { title, description, price, category, imageurl, imageid, seller, stock, status } = input;
 
         const id = uuidv4();
-        console.log(seller, stock);
 
 
         try {
             const query = await pool.query(
-                'INSERT INTO products (id, uid, title, description, price, category, imageurl, imageid, seller, stock) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);',
-                [id, uid, title, description, price, category, imageurl, imageid, seller, stock]
+                'INSERT INTO products (id, uid, title, description, price, category, imageurl, imageid, seller, stock, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);',
+                [id, uid, title, description, price, category, imageurl, imageid, seller, stock, status]
             );
 
         } catch (error) {
@@ -242,22 +241,31 @@ export class ProductsModel {
         }
     }
 
-    static searchProducts = async (text, min, max) => {
+    static searchProducts = async (text, min, max, id, status) => {
         try {
-            const query = {
-                text: `
-        SELECT *
-        FROM products
-        WHERE
-          (
-            unaccent(title) ILIKE unaccent($1)
-            OR unaccent(description) ILIKE unaccent($1)
-          )
-        AND price >= $2
-        AND price <= $3;
-      `,
-                values: [`%${text}%`, min, max],
-            };
+            let baseQuery = `
+      SELECT *
+      FROM products
+      WHERE (
+        unaccent(title) ILIKE unaccent($1)
+        OR unaccent(description) ILIKE unaccent($1)
+      )
+      AND price >= $2
+      AND price <= $3
+      AND uid != $4
+    `;
+
+            const values = [`%${text}%`, min, max, id];
+            let paramIndex = 5;
+
+            // Solo filtra si el status es válido
+            if (status === "new" || status === "used") {
+                baseQuery += ` AND status = $${paramIndex}`;
+                values.push(status);
+                paramIndex++;
+            }
+
+            const query = { text: baseQuery, values };
 
             const response = await pool.query(query);
             return response.rows;
@@ -267,6 +275,32 @@ export class ProductsModel {
             throw error;
         }
     };
+
+
+    static addProductToCart = async (input) => {
+
+        const {id, uid, quantity} = input
+        try {
+            const query = {
+                text: `
+        INSERT INTO cart_items (user_id, product_id, quantity)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (user_id, product_id)
+        DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity
+        RETURNING *;
+      `,
+                values: [ uid, id,  quantity],
+            };
+
+            const result = await pool.query(query);
+            return result.rows[0];
+
+        } catch (error) {
+            console.error("Error en addProductToCart:", error);
+            throw error;
+        }
+    };
+
 
 
 

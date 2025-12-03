@@ -15,6 +15,8 @@ export const createProductsRouter = ({ productsModel }) => {
   productsRouter.put('/update/:id', veryfyToken, productsController.updateProduct);
   productsRouter.post('/sale', veryfyToken, productsController.createSale) 
   productsRouter.get('/search', veryfyToken, productsController.searchProducts) 
+  productsRouter.post('/saveToCart', veryfyToken, productsController.addToCart) 
+
 
 
   return productsRouter

@@ -1,6 +1,9 @@
+import { validatePartialCart } from "../schemas/cart.js";
 import { validateProduct, validatePartialProduct } from "../schemas/product.js";
 import { validatePartialSale, validateSale } from "../schemas/sales.js";
 import { deleteImage } from "../utils.js";
+import jwt from "jsonwebtoken";
+
 
 
 export class ProductsController {
@@ -194,11 +197,20 @@ export class ProductsController {
 
 
     searchProducts = async (req, res) => {
-        const { query, min = 0, max = 999999999 } = req.query;
-console.log('PARAMS: ',req.query);
 
+        const { query, min = 0, max = 999999999, status = "new" } = req.query;
+        console.log("query", req.query);
+        
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const id = decoded.id
         try {
-            const search = await this.productsModel.searchProducts(query, min, max);
+            const search = await this.productsModel.searchProducts(query, min, max, id, status);
 
             return res.status(200).json(search);
 
@@ -208,6 +220,25 @@ console.log('PARAMS: ',req.query);
         }
     };
 
+
+     addToCart = async (req, res) => {
+        const result = validatePartialCart(req.body)
+        
+
+        if (!result.success) {
+            return res.status(400).json({ error: JSON.parse(result.error.message) })
+        }
+
+        try {
+            const response = await this.productsModel.addProductToCart(result.data)
+            return res.status(201).json(response)
+            
+        } catch (error) {
+            console.error(error)
+            return res.status(500).json({ error: 'Error adding to cart' })
+
+        }
+    }
 
 
 }
