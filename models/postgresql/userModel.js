@@ -66,7 +66,8 @@ export class UserModel {
             const query = {
                 text: `SELECT *
                 FROM sales
-                WHERE buyer_id = $1`,
+                WHERE buyer_id = $1
+                ORDER BY created_at DESC`,
                 values: [id],
             };
 

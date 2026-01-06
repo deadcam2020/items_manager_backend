@@ -12,7 +12,7 @@ export const saleSchema = z.object({
 
   seller_id: z.string({
     required_error: "El ID del vendedor es obligatorio",
-  }).uuid("buyer_id debe ser un UUID válido"),
+  }).uuid("buyer_id debe ser un UUID válido").optional(),
 
   product_id: z.string({
     required_error: "El ID del producto es obligatorio",

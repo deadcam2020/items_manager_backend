@@ -174,14 +174,14 @@ export class ProductsController {
         const result = validatePartialSale(req.body)
         const buyer_id = result.data.buyer_id;
 
-        console.log('buyer_id: ', buyer_id);
+        // console.log('buyer_id: ', buyer_id);
 
 
         if (!result.success) {
             return res.status(400).json({ error: JSON.parse(result.error.message) })
         }
 
-        console.log("Data: ", result.data);
+        // console.log("Data: ", result.data);
 
 
         try {
@@ -199,8 +199,7 @@ export class ProductsController {
     searchProducts = async (req, res) => {
 
         const { query, min = 0, max = 999999999, status = "new" } = req.query;
-        console.log("query", req.query);
-        
+
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -221,9 +220,9 @@ export class ProductsController {
     };
 
 
-     addToCart = async (req, res) => {
+    addToCart = async (req, res) => {
         const result = validatePartialCart(req.body)
-        
+
 
         if (!result.success) {
             return res.status(400).json({ error: JSON.parse(result.error.message) })
@@ -232,7 +231,7 @@ export class ProductsController {
         try {
             const response = await this.productsModel.addProductToCart(result.data)
             return res.status(201).json(response)
-            
+
         } catch (error) {
             console.error(error)
             return res.status(500).json({ error: 'Error adding to cart' })
@@ -240,5 +239,39 @@ export class ProductsController {
         }
     }
 
+
+    getCartItems = async (req, res) => {
+
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const id = decoded.id
+
+        try {
+            const response = await this.productsModel.getCartByUserId(id)
+            res.status(201).json(response)
+            
+        } catch (error) {
+         console.error('error')   
+         res.status(500).json({error: "Error en getCartItems "})
+        }
+    }
+
+     deleteFromCart = async (req, res) => {
+
+        const {id} = req.params
+        try {
+            const response = await this.productsModel.deleteFromCartById(id)
+            res.status(201).json(response)
+            
+        } catch (error) {
+         console.error('error')   
+         res.status(500).json({error: "Error en deleteFromCart "})
+        }
+    }
 
 }

@@ -181,29 +181,46 @@ export class ProductsModel {
 
     static async saveSale({ buyer_id, input }) {
         const { seller_id, seller_name, buyer_name, product_id, unit_price, quantity, payment_method, imageurl, title } = input;
-
+        console.log(input);
+        
         const id = uuidv4();
+
+        // buscar el Seller_id si no se manda desde la compra en el carrito
+        let finalSellerId = seller_id
+        if (!finalSellerId) {
+            const idtmp = await pool.query(
+                `SELECT uid FROM products WHERE id = $1;`,
+                [product_id]
+            )
+            finalSellerId = idtmp.rows[0].uid;
+        }else{
+            finalSellerId = seller_id;
+        }
 
         try {
             const query = await pool.query(
                 'INSERT INTO sales (id, buyer_id, seller_id, seller_name, buyer_name, product_id, unit_price, quantity, payment_method, imageurl, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);',
-                [id, buyer_id, seller_id, seller_name, buyer_name, product_id, unit_price, quantity, payment_method, imageurl, title,]
+                [id, buyer_id, finalSellerId, seller_name, buyer_name, product_id, unit_price, quantity, payment_method, imageurl, title,]
             );
+
+            const saveSold = await pool.query(
+                `UPDATE products
+                SET sold = sold + $1,
+                    stock = stock - $1
+                WHERE id = $2;`,
+                [quantity, product_id]
+            )
 
         } catch (error) {
             console.error("Error en saveSale:", error);
-            throw new Error("Error creating new product");
+            throw new Error("Error saving Sale");
         }
-
 
         const result = await pool.query(
             `SELECT *
             FROM sales WHERE id = $1;`,
             [id]
         )
-
-
-
         return result.rows
     }
 
@@ -279,7 +296,7 @@ export class ProductsModel {
 
     static addProductToCart = async (input) => {
 
-        const {id, uid, quantity} = input
+        const { id, uid, quantity } = input
         try {
             const query = {
                 text: `
@@ -289,7 +306,7 @@ export class ProductsModel {
         DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity
         RETURNING *;
       `,
-                values: [ uid, id,  quantity],
+                values: [uid, id, quantity],
             };
 
             const result = await pool.query(query);
@@ -301,7 +318,88 @@ export class ProductsModel {
         }
     };
 
+    //TODO consulta para obtener los productos del carrito con sus propiedades
+    static getCartByUserId = async (uid) => {
 
+        try {
+            const query = {
+                text: `
+         SELECT 
+            c.id AS cart_item_id,
+            c.quantity,
+            p.id AS product_id,
+            p.title,
+            p.price,
+            p.stock,
+            p.imageurl,
+            p.category,
+            p.status,
+            p.seller
+          FROM cart_items c
+          JOIN products p ON p.id = c.product_id
+          WHERE c.user_id = $1;
+      `,
+                values: [uid],
+            };
+
+            const result = await pool.query(query);
+            const rows = result.rows.map(item => ({
+                ...item,
+                price: Number(item.price),
+                stock: Number(item.stock),
+                quantity: Number(item.quantity)
+            }));
+
+            return rows;
+
+        } catch (error) {
+            console.error("Error en getCartByUserId:", error);
+            throw error;
+        }
+    };
+
+
+    static async deleteFromCartById(id) {
+
+        try {
+            const query = {
+                text: `DELETE
+                FROM cart_items
+                WHERE id = $1`,
+                values: [id],
+            };
+
+            await pool.query(query)
+
+
+            return true
+
+        } catch (error) {
+            console.log('daleteProductById error: ', error);
+            throw error
+        }
+    }
+
+    static async deleteCart(id) {
+
+        try {
+            const query = {
+                text: `DELETE
+                FROM cart_items
+                WHERE user_id = $1`,
+                values: [id],
+            };
+
+            await pool.query(query)
+
+
+            return true
+
+        } catch (error) {
+            console.log('daleteProductById error: ', error);
+            throw error
+        }
+    }
 
 
 }
