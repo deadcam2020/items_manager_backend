@@ -182,7 +182,7 @@ export class ProductsModel {
     static async saveSale({ buyer_id, input }) {
         const { seller_id, seller_name, buyer_name, product_id, unit_price, quantity, payment_method, imageurl, title } = input;
         console.log(input);
-        
+
         const id = uuidv4();
 
         // buscar el Seller_id si no se manda desde la compra en el carrito
@@ -193,7 +193,7 @@ export class ProductsModel {
                 [product_id]
             )
             finalSellerId = idtmp.rows[0].uid;
-        }else{
+        } else {
             finalSellerId = seller_id;
         }
 
@@ -400,6 +400,35 @@ export class ProductsModel {
             throw error
         }
     }
+
+   static async addProductValorationById(id, valoration) {
+    console.log('model ', id, valoration);
+    
+  try {
+    const query = {
+      text: `
+        UPDATE products
+        SET
+          valorations = array_append(COALESCE(valorations, '{}'), $1),
+          total_valorations = COALESCE(total_valorations, 0) + 1,
+          valoration = (
+            SELECT ROUND(AVG(v)::numeric, 2)
+            FROM unnest(array_append(COALESCE(valorations, '{}'), $1)) AS v
+          )
+        WHERE id = $2
+        RETURNING valorations, total_valorations, valoration;
+      `,
+      values: [valoration, id],
+    };
+
+    const result = await pool.query(query);
+    return result.rows[0];
+
+  } catch (error) {
+    console.log("addProductValorationById error:", error);
+    throw error;
+  }
+}
 
 
 }

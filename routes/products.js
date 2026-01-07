@@ -18,6 +18,8 @@ export const createProductsRouter = ({ productsModel }) => {
   productsRouter.post('/saveToCart', veryfyToken, productsController.addToCart) 
   productsRouter.get('/getCart', veryfyToken, productsController.getCartItems) 
   productsRouter.delete('/deleteFromCart/:id', veryfyToken, productsController.deleteFromCart) 
+  productsRouter.post('/addValoration', veryfyToken, productsController.addProductValoration) 
+
 
 
 

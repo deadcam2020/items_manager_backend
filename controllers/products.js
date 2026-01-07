@@ -263,9 +263,25 @@ export class ProductsController {
 
      deleteFromCart = async (req, res) => {
 
-        const {id} = req.params
+        const {id, valoration} = req.params
         try {
-            const response = await this.productsModel.deleteFromCartById(id)
+            const response = await this.productsModel.deleteFromCartById(id, valoration)
+            res.status(201).json(response)
+            
+        } catch (error) {
+         console.error('error')   
+         res.status(500).json({error: "Error en deleteFromCart "})
+        }
+    }
+
+     addProductValoration = async (req, res) => {
+
+        const {id, valoration} = req.body
+        console.log(id, valoration);
+        
+        try {
+            const response = await this.productsModel.addProductValorationById(id, valoration)
+            
             res.status(201).json(response)
             
         } catch (error) {
