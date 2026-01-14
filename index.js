@@ -14,6 +14,8 @@ import dotenv from 'dotenv'
 import { UploadModel } from "./models/upload.js";
 import { createProductsRouter } from "./routes/products.js";
 import { ProductsModel } from "./models/postgresql/productsModel.js";
+import { createAdminRouter } from "./routes/admin.js";
+import { AdminModel } from "./models/postgresql/adminModel.js";
 
 dotenv.config()
 const app = express();
@@ -37,6 +39,7 @@ app.use("/api/users", createUserRouter({ userModel: UserModel }));
 app.use("/api/login", createLoginRouter({loginModel: LoginModel}))
 app.use("/api/upload", createUploadRouter({uploadModel: UploadModel}))
 app.use("/api/products", createProductsRouter({productsModel: ProductsModel}))
+app.use("/api/admin", createAdminRouter({adminModel: AdminModel})  )
 
 app.use("/api/auth", createAuthRouter());
 

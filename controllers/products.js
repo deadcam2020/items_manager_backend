@@ -77,11 +77,29 @@ export class ProductsController {
     };
 
 
-    getProducts = async (req, res) => {
-        const { id } = req.query
+    getProductsByUser = async (req, res) => {
+        const { id } = req.params
 
         try {
-            const products = await this.productsModel.getAllProducts(id);
+            const products = await this.productsModel.getProductsByUserId(id);
+
+            if (!products || products.length === 0) {
+                return res.status(404).json({ message: "No se encontraron productos" });
+            }
+
+            //  Devuelve solo el primer producto, no un array
+            return res.status(200).json(products);
+
+        } catch (error) {
+            console.error("Error en getProductById:", error);
+            return res.status(500).json({ error: "Error obteniendo los productos" });
+        }
+    };
+
+    getAllProducts = async (req, res) => {
+
+        try {
+            const products = await this.productsModel.getAllProducts();
 
             if (!products || products.length === 0) {
                 return res.status(404).json({ message: "No se encontraron productos" });
@@ -254,39 +272,39 @@ export class ProductsController {
         try {
             const response = await this.productsModel.getCartByUserId(id)
             res.status(201).json(response)
-            
+
         } catch (error) {
-         console.error('error')   
-         res.status(500).json({error: "Error en getCartItems "})
+            console.error('error')
+            res.status(500).json({ error: "Error en getCartItems " })
         }
     }
 
-     deleteFromCart = async (req, res) => {
+    deleteFromCart = async (req, res) => {
 
-        const {id, valoration} = req.params
+        const { id, valoration } = req.params
         try {
             const response = await this.productsModel.deleteFromCartById(id, valoration)
             res.status(201).json(response)
-            
+
         } catch (error) {
-         console.error('error')   
-         res.status(500).json({error: "Error en deleteFromCart "})
+            console.error('error')
+            res.status(500).json({ error: "Error en deleteFromCart " })
         }
     }
 
-     addProductValoration = async (req, res) => {
+    addProductValoration = async (req, res) => {
 
-        const {id, valoration} = req.body
+        const { id, valoration } = req.body
         console.log(id, valoration);
-        
+
         try {
             const response = await this.productsModel.addProductValorationById(id, valoration)
-            
+
             res.status(201).json(response)
-            
+
         } catch (error) {
-         console.error('error')   
-         res.status(500).json({error: "Error en deleteFromCart "})
+            console.error('error')
+            res.status(500).json({ error: "Error en deleteFromCart " })
         }
     }
 

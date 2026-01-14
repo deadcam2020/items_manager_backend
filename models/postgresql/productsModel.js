@@ -110,7 +110,8 @@ export class ProductsModel {
         }
     }
 
-    static async getAllProducts(id) {
+    static async getProductsByUserId(id) {
+
 
         try {
             const query = {
@@ -131,6 +132,29 @@ export class ProductsModel {
 
         }
     }
+
+    
+    static async getAllProducts() {
+
+        try {
+            const query = {
+                text: `SELECT *
+                FROM products;
+                `
+            };
+
+            const result = await pool.query(query)
+
+            if (!result) console.log('No hay query')
+
+            return result.rows;
+
+        } catch (error) {
+            console.log('findProductById error: ', error);
+
+        }
+    }
+
 
     static async deleteProductById(id) {
 
