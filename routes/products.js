@@ -11,7 +11,8 @@ export const createProductsRouter = ({ productsModel }) => {
 
   productsRouter.get('/userProducts/:uid', veryfyToken, productsController.getUserProducts)
   productsRouter.get('/products/:id', veryfyToken, productsController.getProductsByUser) // obtiene todos los productos que no son del usuarioque hace la petición
-  productsRouter.get('/allProducts', veryfyToken, productsController.getAllProducts)
+  productsRouter.get('/product/:id', veryfyToken, productsController.getProductById)
+  
 
   productsRouter.delete('/deleteProduct/:id', veryfyToken, productsController.deleteProduct)
   productsRouter.put('/update/:id', veryfyToken, productsController.updateProduct);

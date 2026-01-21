@@ -7,6 +7,10 @@ export const createAdminRouter = ({adminModel}) => {
     const adminControler = new AdminController({adminModel});
 
     adminRouter.get('/allProducts', adminControler.getAllProducts)
+    adminRouter.get('/categories', adminControler.getCategories)
+    adminRouter.get('/home_data', adminControler.getAdminHomeData)
+
+
 
     return adminRouter
 
