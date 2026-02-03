@@ -60,4 +60,56 @@ export class AdminController {
         }
     };
 
+       usersGeneralInfo = async (req, res) => {
+
+        try {
+            const result = await this.adminModel.getUsersGeneralInfo();
+
+            if (!result || result.length === 0) {
+                return res.status(404).json({ message: "No se encontraron datos" });
+            }
+
+            return res.status(200).json(result);
+
+        } catch (error) {
+            console.error("Error en usersGeneralInfo:", error);
+            return res.status(500).json({ error: "Error obteniendo la data" });
+        }
+    };
+
+      getProductsByCategory = async (req, res) => {
+
+        try {
+            const result = await this.adminModel.countProductsByCategory();
+
+            if (!result || result.length === 0) {
+                return res.status(404).json({ message: "No se encontraron datos" });
+            }
+
+            return res.status(200).json(result);
+
+        } catch (error) {
+            console.error("Error en getProductsByCategory:", error);
+            return res.status(500).json({ error: "Error obteniendo la data" });
+        }
+    };
+
+    
+      getDashboardStats = async (req, res) => {
+
+        try {
+            const result = await this.adminModel.best_selling_products_and_sales_per_month();
+
+            if (!result || result.length === 0) {
+                return res.status(404).json({ message: "No se encontraron datos" });
+            }
+
+            return res.status(200).json(result);
+
+        } catch (error) {
+            console.error("Error en getDashboardStats:", error);
+            return res.status(500).json({ error: "Error obteniendo la data del dashboard" });
+        }
+    };
+
 }
