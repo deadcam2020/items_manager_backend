@@ -27,12 +27,18 @@ export class UploadModel {
     }
   }
 
-  // static async delete(fileId) {
-  //   try {
-  //     await deleteImage(fileId)
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
+  static async uploadReportImage(filePath) {
+    try {
+      const result = await uploadImage({
+        filePath,
+        folder: "items_manager_reports", //carpeta que hemos creado en Cloudinary para las imágenes de los reportes
+      });
+      return result;
+    } catch (error) {
+      console.error("UploadModel error:", error);
+      return null;
+    }
+  }
+
 
 }

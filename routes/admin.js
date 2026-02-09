@@ -12,6 +12,7 @@ export const createAdminRouter = ({adminModel}) => {
     adminRouter.get('/users_info', adminControler.usersGeneralInfo)
     adminRouter.get('/products_by_category', adminControler.getProductsByCategory)
     adminRouter.get('/dashboard_stats', adminControler.getDashboardStats)
+    adminRouter.get('/all_reports', adminControler.getAllReports)
 
 
 

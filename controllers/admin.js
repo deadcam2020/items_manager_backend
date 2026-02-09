@@ -42,7 +42,7 @@ export class AdminController {
             return res.status(500).json({ error: "Error obteniendo las categorías" });
         }
     };
-    
+
     getAdminHomeData = async (req, res) => {
 
         try {
@@ -60,7 +60,7 @@ export class AdminController {
         }
     };
 
-       usersGeneralInfo = async (req, res) => {
+    usersGeneralInfo = async (req, res) => {
 
         try {
             const result = await this.adminModel.getUsersGeneralInfo();
@@ -77,7 +77,7 @@ export class AdminController {
         }
     };
 
-      getProductsByCategory = async (req, res) => {
+    getProductsByCategory = async (req, res) => {
 
         try {
             const result = await this.adminModel.countProductsByCategory();
@@ -94,8 +94,8 @@ export class AdminController {
         }
     };
 
-    
-      getDashboardStats = async (req, res) => {
+
+    getDashboardStats = async (req, res) => {
 
         try {
             const result = await this.adminModel.best_selling_products_and_sales_per_month();
@@ -111,5 +111,24 @@ export class AdminController {
             return res.status(500).json({ error: "Error obteniendo la data del dashboard" });
         }
     };
+
+    getAllReports = async (req, res) => {
+
+        try {
+            const result = await this.adminModel.getAllReports();
+
+            if (!result || result.length === 0) {
+                return res.status(404).json({ message: "No se encontraron reportes" });
+            }
+
+            return res.status(200).json(result);
+
+        } catch (error) {
+            console.error("Error en getAllReports:", error);
+            return res.status(500).json({ error: "Error obteniendo los reportes" });
+        }
+    };
+
+    
 
 }

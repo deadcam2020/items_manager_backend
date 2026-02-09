@@ -49,7 +49,7 @@ export class UploadController {
     }
   };
 
-  // 🔹 Subir imagen de perfil
+  //  Subir imagen de perfil
   uploadProfileImage = async (req, res) => {
 
     const {oldProfileImageId} = req.body
@@ -106,4 +106,48 @@ export class UploadController {
       res.status(500).json({ error: "Error uploading profile image" });
     }
   };
+
+
+ uploadReportImage = async (req, res) => {
+     try {
+      if (!req.files?.reportImage) {
+        return res.status(400).json({ error: "No image uploaded" });
+      }
+
+      // const userId = req.user?.id;
+      // if (!userId) {
+      //   return res.status(401).json({ error: "User not authenticated" });
+      // }
+
+      const filePath = req.files.reportImage.tempFilePath;
+
+      // Subir a Cloudinary
+      const uploadResult = await this.uploadModel.uploadReportImage(filePath);
+
+      // Intentar eliminar el archivo temporal (sin romper si no existe)
+      try {
+        await unlink(filePath);
+      } catch (unlinkErr) {
+        console.warn(" Archivo temporal no encontrado:", unlinkErr.message);
+      }
+
+      if (!uploadResult) {
+        return res
+          .status(500)
+          .json({ error: "Error uploading to Cloudinary" });
+      }
+
+      const imageurl = uploadResult.secure_url;
+      const imageid = uploadResult.public_id;
+
+     
+
+      return res.status(201).json({ imageurl, imageid });
+    } catch (error) {
+      console.error("Error in uploadProductImage:", error);
+      res.status(500).json({ error: "Error uploading product image" });
+    }
+  };
+
+
 }

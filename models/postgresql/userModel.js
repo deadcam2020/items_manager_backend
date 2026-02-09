@@ -83,4 +83,31 @@ export class UserModel {
         }
     }
 
+   
+      static async createNewReport(result) {
+        const { uid, headline, description, imageid, imageurl } = result;
+
+        const id = uuidv4(); // Generar un nuevo UUID para el reporte
+        
+        try {
+            const query = {
+                text: `INSERT INTO reports 
+                (id, uid, headline, description, image_id, image_url) 
+                VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;`,
+                values: [id, uid, headline, description, imageid, imageurl],
+            };
+
+            const result = await pool.query(query)
+
+            if (!result) console.log('No hay query')
+
+            return result.rows;
+
+        } catch (error) {
+            console.log('createNewReport error: ', error);
+
+        }
+    }
+
+
 }

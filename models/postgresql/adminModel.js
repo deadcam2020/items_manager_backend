@@ -143,10 +143,10 @@ ORDER BY total_products DESC;
     }
   }
 
-    static async best_selling_products_and_sales_per_month() {
+  static async best_selling_products_and_sales_per_month() {
 
-try {
-    const result = await pool.query(`
+    try {
+      const result = await pool.query(`
       WITH best_selling_products AS (
         SELECT 
           p.id,
@@ -171,13 +171,40 @@ try {
         (SELECT json_agg(sales_per_month) FROM sales_per_month) AS sales_by_month;
     `);
 
-    return result.rows[0];
-  } catch (error) {
-    console.error("Dashboard error:", error);
-    throw error;
-  }
+      return result.rows[0];
+    } catch (error) {
+      console.error("Dashboard error:", error);
+      throw error;
+    }
   }
 
+  static async getAllReports() {
+    try {
+      const query = {
+        text: `
+        SELECT 
+    r.id,
+    r.headline,
+    r.description,
+    r.status,
+    r.created_at,
+    r.image_url,
+    u.name AS user_name
+FROM reports r
+INNER JOIN users u ON r.uid = u.id
+ORDER BY r.created_at DESC;
+
+        `
+      };
+
+      const result = await pool.query(query);
+      return result.rows;
+
+    } catch (error) {
+      console.error('getAllReports error: ', error);
+      throw error;
+    }
+  }
 
 }
 

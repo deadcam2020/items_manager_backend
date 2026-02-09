@@ -10,6 +10,8 @@ export const createUploadRouter = () => {
 
   uploadRouter.post('/productImage', veryfyToken, uploadController.uploadProductImage);
   uploadRouter.post('/profileImage', veryfyToken, uploadController.uploadProfileImage);
+  uploadRouter.post('/reportImage', veryfyToken, uploadController.uploadReportImage);
+
 
   return uploadRouter;
 };
