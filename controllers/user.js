@@ -1,6 +1,8 @@
+
+
+
 import { validatePartialReport } from '../schemas/reports.js'
 import { validatePartialUser, validateUser } from '../schemas/user.js'
-import { deleteImage } from '../utils.js'
 
 export class UserController {
   constructor({ userModel }) {
@@ -27,8 +29,7 @@ export class UserController {
   updateUser = async (req, res) => {
     const result = validatePartialUser(req.body)
     const userId = req.user.id;
-
-
+console.log("data int", req.body);
 
     if (!result.success) {
       return res.status(400).json({ error: JSON.parse(result.error.message) })
@@ -70,9 +71,9 @@ export class UserController {
 
   createNewReport = async (req, res) => {
     const result = validatePartialReport(req.body)
-console.log("data int", req.body);
+    console.log("data int", req.body);
 
-console.log("data ", result.data);
+    console.log("data ", result.data);
 
     if (!result.success) {
       return res.status(400).json({ error: JSON.parse(result.error.message) })

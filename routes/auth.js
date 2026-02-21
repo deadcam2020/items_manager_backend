@@ -2,6 +2,7 @@ import { Router } from "express";
 import jwt from "jsonwebtoken";
 import pool from "../db.js"; // ajusta la ruta si tu db.js está en otra carpeta
 import dotenv from "dotenv";
+import { googleAuth } from "../controllers/googleAuth.js";
 
 dotenv.config();
 
@@ -40,7 +41,10 @@ export const createAuthRouter = () => {
       console.error("Error verificando token:", error);
       return res.status(401).json({ message: "Invalid or expired token" });
     }
-  });
+  })
+  
+  router.post("/google", googleAuth);
+  
 
   return router;
 };

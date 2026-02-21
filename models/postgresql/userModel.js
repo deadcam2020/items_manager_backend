@@ -40,6 +40,7 @@ export class UserModel {
     static async updateUser({ id, input }) {
         const keys = Object.keys(input)
         const values = Object.values(input)
+console.log(input.department);
 
         if (keys.length === 0) {
             throw new Error('No hay campos para actualizar')

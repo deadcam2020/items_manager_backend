@@ -23,11 +23,11 @@ const userSchema = z.object({
     .optional(),
 
   phone: z.string()
-    .min(7, { message: 'El teléfono es demasiado corto' })
-    .max(15, { message: 'El teléfono es demasiado largo' })
+    .min(10, { message: 'El teléfono es demasiado corto' })
+    .max(10, { message: 'El teléfono es demasiado largo' })
     .optional(),
 
-  departament: z.string()
+  department: z.string()
     .max(50, { message: 'El nombre del departamento es demasiado largo' })
     .optional(),
 
