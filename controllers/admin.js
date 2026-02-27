@@ -1,3 +1,5 @@
+import { id } from "zod/locales";
+import { validatePartialReport } from "../schemas/reports.js";
 
 
 export class AdminController {
@@ -126,6 +128,32 @@ export class AdminController {
         } catch (error) {
             console.error("Error en getAllReports:", error);
             return res.status(500).json({ error: "Error obteniendo los reportes" });
+        }
+    };
+
+
+     reportRResponse = async (req, res) => {
+
+        const result =  validatePartialReport(req.body)
+        const id = req.params.id
+        const response = result.data.response
+
+         if (!result) {
+            return res.status(400).json({ message: "Datos inválidos", errors: result.error.errors });
+        }
+
+        try {
+            const result = await this.adminModel.postReportResponse(response, id);
+
+            if (!result || result.length === 0) {
+                return res.status(404).json({ message: "No se encontraron reportes" });
+            }
+
+            return res.status(200).json(result);
+
+        } catch (error) {
+            console.error("Error en reportRResponse:", error);
+            return res.status(500).json({ error: "Error actualizando el reporte" });
         }
     };
 

@@ -2,9 +2,9 @@ import { Router } from "express";
 import { AdminController } from "../controllers/admin.js";
 
 
-export const createAdminRouter = ({adminModel}) => {
+export const createAdminRouter = ({ adminModel }) => {
     const adminRouter = Router();
-    const adminControler = new AdminController({adminModel});
+    const adminControler = new AdminController({ adminModel });
 
     adminRouter.get('/allProducts', adminControler.getAllProducts)
     adminRouter.get('/categories', adminControler.getCategories)
@@ -13,6 +13,8 @@ export const createAdminRouter = ({adminModel}) => {
     adminRouter.get('/products_by_category', adminControler.getProductsByCategory)
     adminRouter.get('/dashboard_stats', adminControler.getDashboardStats)
     adminRouter.get('/all_reports', adminControler.getAllReports)
+    adminRouter.get('/all_reports', adminControler.getAllReports)
+    adminRouter.put('/report_response/:id', adminControler.reportRResponse)
 
 
 

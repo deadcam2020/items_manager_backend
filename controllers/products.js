@@ -171,7 +171,7 @@ export class ProductsController {
                 input: result.data,
             });
 
-            //  Si viene oldImageId, eliminar imagen previa en Cloudinary
+            //  Si viene oldImageId, eliminar imagen antigua en Cloudinary
             if (oldImageId) {
                 try {
                     await deleteImage(oldImageId);
@@ -192,15 +192,9 @@ export class ProductsController {
         const result = validatePartialSale(req.body)
         const buyer_id = result.data.buyer_id;
 
-        // console.log('buyer_id: ', buyer_id);
-
-
         if (!result.success) {
             return res.status(400).json({ error: JSON.parse(result.error.message) })
         }
-
-        // console.log("Data: ", result.data);
-
 
         try {
             const sale = await this.productsModel.saveSale({ buyer_id, input: result.data })
@@ -281,9 +275,23 @@ export class ProductsController {
 
     deleteFromCart = async (req, res) => {
 
-        const { id, valoration } = req.params
+        const { id} = req.params
         try {
             const response = await this.productsModel.deleteFromCartById(id, valoration)
+            res.status(201).json(response)
+
+        } catch (error) {
+            console.error('error')
+            res.status(500).json({ error: "Error en deleteFromCart " })
+        }
+    }
+
+    
+    deleteCart = async (req, res) => {
+
+        const { id } = req.params
+        try {
+            const response = await this.productsModel.deleteCart(id)
             res.status(201).json(response)
 
         } catch (error) {

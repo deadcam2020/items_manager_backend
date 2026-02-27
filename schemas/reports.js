@@ -1,9 +1,9 @@
 import z from 'zod'
 
 const reportSchema = z.object({
-    uid: z.string({
-      required_error: "El ID del comprador es obligatorio",
-    }).uuid("uid debe ser un UUID válido"),
+  uid: z.string({
+    required_error: "El ID del comprador es obligatorio",
+  }).uuid("uid debe ser un UUID válido"),
 
   headline: z.string({
     required_error: 'El título es obligatorio.'
@@ -21,8 +21,15 @@ const reportSchema = z.object({
   })
     .default('pending'),
 
-    imageurl: z.string().optional(), // 👈 agrega esto
-    imageid: z.string().optional(),
+  imageurl: z.string().optional(), // 👈 agrega esto
+  imageid: z.string().optional(),
+
+
+  response: z.string({
+    required_error: 'La respuesta es obligatoria.'
+  })
+    .min(10, { message: 'La respuesta es demasiado corta' })
+    .optional(),
 
 })
 

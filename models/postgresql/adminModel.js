@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import pool from "../../db.js";
+import { stat } from 'fs';
 
 export class AdminModel {
 
@@ -57,6 +58,7 @@ ORDER BY total_products DESC;
         text: `SELECT 
   (SELECT COUNT(*) FROM products) AS total_products,
   (SELECT COUNT(DISTINCT LOWER(category)) FROM products) AS total_categories,
+  (SELECT COUNT(*) FROM reports) AS total_reports,  
   (SELECT COUNT(*) FROM users) AS total_users;
                 `
       };
@@ -206,8 +208,34 @@ ORDER BY r.created_at DESC;
     }
   }
 
-}
+  static async postReportResponse(response, id) {
 
+    const status = 'resolved'
+
+    try {
+      const query = {
+        text: `
+          UPDATE reports
+          SET response = $1, status = $2
+          WHERE id = $3
+          RETURNING *;
+                `,
+        values: [response, status, id]
+                
+      };
+
+      const result = await pool.query(query)
+
+      if (!result) console.log('No hay query')
+
+      return result.rows;
+
+    } catch (error) {
+      console.log('getAllProducts error: ', error);
+
+    }
+  }
+}
 
 
 

@@ -205,7 +205,6 @@ export class ProductsModel {
 
     static async saveSale({ buyer_id, input }) {
         const { seller_id, seller_name, buyer_name, product_id, unit_price, quantity, payment_method, imageurl, title } = input;
-        console.log(input);
 
         const id = uuidv4();
 
