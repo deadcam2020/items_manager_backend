@@ -35,26 +35,26 @@ export class ProductsController {
         }
     }
 
-    getUserProducts = async (req, res) => {
-        //const uid = req.user.id;
-        //console.log('UserID: ', uid, 'result.data: ', result.data);
-        const uid = req.params.uid
+getUserProducts = async (req, res) => {
+    const { uid } = req.params;
 
-        try {
-            const products = await this.productsModel.findByUserId(uid)
+    try {
+        const products = await this.productsModel.findByUserId(uid);
 
-            if (!products || products.length === 0) {
-                res.status(400).json({ message: 'No se encontraros productos de para este usuario' })
-            }
+        if (!products || products.length === 0) {
+            return res.status(200).json([]);
+        }
 
-            res.status(201).json(products)
-            return true
-        } catch (error) {
-            console.error('Error en getuserProducts', error)
-            res.status(500).json({ error: 'Error creating product' })
-            return false
+        return res.status(200).json(products);
+
+    } catch (error) {
+        console.error('Error en getUserProducts:', error);
+        
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Error al obtener los productos' });
         }
     }
+}
 
 
     getProductById = async (req, res) => {
@@ -84,10 +84,9 @@ export class ProductsController {
             const products = await this.productsModel.getProductsByUserId(id);
 
             if (!products || products.length === 0) {
-                return res.status(404).json({ message: "No se encontraron productos" });
+                return res.status(200).json([]);
             }
 
-            //  Devuelve solo el primer producto, no un array
             return res.status(200).json(products);
 
         } catch (error) {
@@ -144,7 +143,7 @@ export class ProductsController {
                 return res.status(404).json({ message: "No se pudo eliminar el producto" });
             }
 
-            return res.status(200).json({ message: "Producto eliminado correctamente" });
+            return res.status(200).json([]);
         } catch (error) {
             console.error("Error en deleteProduct:", error);
             return res.status(500).json({ error: "Error eliminando el producto" });
